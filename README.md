@@ -1,1 +1,1 @@
-# peko-github
+# github
