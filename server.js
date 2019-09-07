@@ -14,21 +14,13 @@ app.prepare().then(()=>{
 
   router.get('/a/:id', async (ctx)=>{ 
     const id = ctx.params.id
+    console.log(ctx)
     await handle(ctx.req,ctx.res, {
       pathname: '/a',
       query: { id }
     })
   })
 
-  router.get('/home', (ctx,next) => {
-    ctx.body = {
-      "success": "200",
-      "data": {
-        Person: ["peko","lucky","nodeone"],
-        age: [12,14,51]
-      }
-    }
-  })
 
   server.use(router.routes(),router.allowedMethods())
 
