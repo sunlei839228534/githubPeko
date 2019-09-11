@@ -1,21 +1,14 @@
-const B = () => <span>{name}</span>
-
-const info = {
-  name: "lili"
-}
-
-const { name } = info
+const B = ({name}) => <span>{name}</span>
 
 B.getInitialProps = async (ctx) => {
-  // const promise = new Promise(resolve => {
-  //   setTimeout(()=>{
-  //     resolve({
-  //       name
-  //     })
-  //   },1000)
-  // })
-  // return await promise
-  return {name}
+  const promise = new Promise(resolve=>{
+    setTimeout(()=>{
+      resolve({
+        name:"sunlei"
+      })
+    },1000)
+  })
+  return await promise
 }
 
 export default B

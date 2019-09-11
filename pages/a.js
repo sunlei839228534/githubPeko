@@ -31,12 +31,6 @@ const A = ({ router,name,time }) => {
     )
 }
 
-const info = {
-  name: "peko"
-}
-
-const { name } = info
-
 A.getInitialProps = async (ctx) => {
   //懒加载模块
   const moment = await import('moment')
@@ -44,7 +38,7 @@ A.getInitialProps = async (ctx) => {
   const promise = new Promise(resolve => {
     setTimeout(()=>{
       resolve({
-        name,
+        name:"peko",
         time: moment.default(Date.now()-60*1000).fromNow()
       })
     },1000)
