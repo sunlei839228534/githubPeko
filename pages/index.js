@@ -1,4 +1,4 @@
-import { useState,useEffect } from 'react'
+import { useState,useEffect, Children } from 'react'
 import { Button } from 'antd'
 import axios from 'axios'
 import Link from 'next/link'
@@ -30,15 +30,29 @@ const { publicRuntimeConfig } = getConfig()
 const context = () => {
   const [count,setCount] = useState(0)
   const [resp,setResp] = useState({})
+
+
   function handleClick() {
     setCount(count+1)
   }
+  console.log(resp)
   useEffect(()=>{
-    axios.get('/api/user/info').then(resp=>setResp(resp))
+    axios.get('/api/user/info').then(res=>{
+      setResp(res)
+    })
   },[])
-
   return (
     <>
+    {/* {React.createElement('div',{className:'peko'},'hellowolrd')} 首先通过babel把render里面的内容转化为React的表达式。然后执行render 的时候 返回element */}
+
+    {/* {
+      type: 'div',
+      props: {
+        className: 'peko',
+        children: 'helloworld'
+      }
+    } 调用render后得到一个element 再去初始化element 如果element是一个对象，就看它的type是否是一个原生的标签，如果是*/}
+      {React.createElement('div',{className:null},'hello')}
       <Button onClick={handleClick}>点我!</Button>
       {count}
       <Link as="/a/1" href='/a?id=1'> 
@@ -46,7 +60,9 @@ const context = () => {
       </Link>
       <a href={publicRuntimeConfig.OAUTH_URL}>去登录</a>
     </>
+
   )
 }
 
 export default context
+
