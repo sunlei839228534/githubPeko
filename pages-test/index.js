@@ -4,6 +4,7 @@ import axios from 'axios'
 import Link from 'next/link'
 import getConfig from 'next/config'
 import {connect} from 'react-redux'
+import {add} from '../store/store'
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -62,6 +63,11 @@ const context = () => {
     </>
 
   )
+}
+
+context.getInitialProps = async ({reduxStore}) => {
+  reduxStore.dispatch(add(3))
+  return {}
 }
 
 function mapStateToProps(state) {

@@ -12,7 +12,7 @@ const userInitialState = {
   username: 'jokey'
 }
 
-function add (num) {
+export function add (num) {
   return {
     type: ADD,
     num
@@ -49,4 +49,14 @@ const allReducers = combineReducers({
 const store = createStore(allReducers,composeWithDevTools(applyMiddleware(ReduxThunk)))
 
 
-export default store
+export default function initializeStore() {
+  const store = createStore(
+    allReducers,
+    Object.assign({},{
+      counter: initialState,
+      user: userInitialState
+    },state),
+    composeWithDevTools(applyMiddleware(ReduxThunk))
+  )
+  return store
+}
