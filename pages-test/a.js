@@ -6,6 +6,7 @@ import Link from 'next/link'
 import styled from 'styled-components'
 
 
+
 const Title = styled.h1`
   color: yellow;
   font-size: 80px;

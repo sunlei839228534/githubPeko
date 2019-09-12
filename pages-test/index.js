@@ -3,7 +3,7 @@ import { Button } from 'antd'
 import axios from 'axios'
 import Link from 'next/link'
 import getConfig from 'next/config'
-
+import {connect} from 'react-redux'
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -64,5 +64,19 @@ const context = () => {
   )
 }
 
-export default context
+function mapStateToProps(state) {
+  return {
+    counter: state.counter.count,
+    username: state.user.username
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    add: (num) => dispatch({type: 'ADD',num}),
+    rename: (name) => dispatch({type:"UPDATE_USERNAME",name})
+  }
+}
+ 
+export default connect(mapStateToProps,mapDispatchToProps)(context)
 

@@ -2,11 +2,6 @@ import {useState, useCallback} from 'react'
 import store from '../store/store'
 
 export default () => {
-  store.dispatch({
-    type: "ADD",
-    value: 12
-  })
-  console.log(store.getState().count)
   return (
     <div>hi!</div>
   )

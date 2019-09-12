@@ -1,8 +1,11 @@
 import App from 'next/app'
 import React from 'react'
+import {Provider} from 'react-redux'
+import store from '../store/store'
 import 'antd/dist/antd.css'
 import Head from 'next/head'
 import Layout from '../components/Layout'
+
 
 class MyApp extends App {
 
@@ -21,9 +24,11 @@ class MyApp extends App {
       <>
       <Head>
       </Head>
+      <Provider store={store}>
         <Layout>
         <Component {...pageProps} ></Component>
         </Layout>
+        </Provider>
       </>
     )
   }
