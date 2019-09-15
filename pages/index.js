@@ -1,34 +1,35 @@
-import {useState, useCallback} from 'react'
+import {useState, useCallback, Children} from 'react'
 import store from '../store/store'
 
 export default () => {
+  function handleClick() {
+    console.log(1)
+  }
   return (
-    <div>hi!</div>
+    <div onClick={handleClick}>
+      hi!
+    </div>
   )
 }
 
+{/* <div className="peko" id="name">
+ <p className="childrenEle">children</p> 
+</div> */}
 // React.createElement('div',{className:"peko",id:"name"},React.createElement('p',{className:'childrenEle'},'children')) React表达式
 
 // {
 //   type: "div",
 //   props: {
-  
-//     className: 'cn',
+//     className: "peko",
+//     id: "name",
 //     children: [
 //       {
-//         type: function header,
+//         type: 'p',
 //         props: {
-            //  className: "ddd"
-//           children: "hellow"
+//           className: "childrenEle"
+//           children: 'children'
 //         }
-//       },
-//       {
-//         type: "div",
-//         props: {
-//           children: "start to learn right now"
-//         }
-//       },
-//       'right'
+//       }
 //     ]
 //   }
 // }
