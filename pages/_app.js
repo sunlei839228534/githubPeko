@@ -2,7 +2,7 @@ import App from 'next/app'
 import React from 'react'
 import {Provider} from 'react-redux'
 import Router from 'next/router'
-
+import axios from 'axios'
 import Link from 'next/link'
 import 'antd/dist/antd.css'
 import Head from 'next/head'
@@ -41,6 +41,9 @@ class MyApp extends App {
     Router.events.on('routeChangeStart', this.startLoading)
     Router.events.on('routeChangeComplete', this.stopLoading)
     Router.events.on('routeChangeError', this.stopLoading)
+
+    axios.get('/github/search/repositories?q=react').then(res=>{ 
+    })
   }
   componentWillUnmount() {
     Router.events.off('routeChangeStart', this.startLoading)
@@ -60,6 +63,8 @@ class MyApp extends App {
             this.state.loading ? <PageLoading /> : null
           }
         <Layout>
+        <Link href="/"><a>Index</a></Link>
+        <Link href="/detail"><a>detail</a></Link>
         <Component {...pageProps} ></Component>
         </Layout>
         </Provider>

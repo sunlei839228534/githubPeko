@@ -3,7 +3,9 @@ const Router = require('koa-router')
 const next = require('next')
 const session = require('koa-session')
 const Redis = require('ioredis')
+const koaBody = require('koa-body')
 
+const api = require('./server/api')
 const auth = require('./server/auth')
 
 const RedisSessionStore = require('./server/session-store')
@@ -29,10 +31,12 @@ app.prepare().then(()=>{
     store: new RedisSessionStore(redis)
   }
 
+  server.use(koaBody())
   server.use(session(SESSION_CONFIG,server))
 
   //配置处理github Oauth登录
   auth(server)
+  api(server)
 
   router.get('/api/user/info',async ctx=>{
     const user = ctx.session.userInfo

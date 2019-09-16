@@ -1,13 +1,27 @@
-import {useState, useCallback, Children} from 'react'
-import store from '../store/store'
+import {useState, useCallback,useEffect} from 'react'
+import axios from 'axios'
 
-export default () => {
-  function handleClick() {
-    console.log(1)
-  }
+const api = require('../lib/api')
+
+function Index({data}) {
+  console.log(data)
+  useEffect(()=>{
+  }) 
   return (
-    <div onClick={handleClick}>
+    <div>
       hi!
     </div>
   )
 }
+
+Index.getInitialProps = async ({ctx})=> {
+  const result = await api.request({
+    url: '/search/repositories?q=react'
+  },ctx.req,ctx.res)
+
+  return {
+    data: result.data
+  }
+}
+
+export default Index
