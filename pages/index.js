@@ -1,17 +1,40 @@
-import {useState, useCallback,useEffect} from 'react'
-import {Button,Icon} from 'antd'
+import {useEffect} from 'react'
+import {Button,Icon,Tabs} from 'antd'
 import getConfig from 'next/config'
 import {connect} from 'react-redux'
-import axios from 'axios'
+import { withRouter } from 'next/router'
+import LRU from 'lru-cache'
+
+const cache = new LRU({
+  maxAge: 1000 * 60 * 10
+})
 
 import Repo from '../components/Repo'
+const isServer = typeof window === "undefined"
 
 const { publicRuntimeConfig } = getConfig()
 
+
 const api = require('../lib/api')
 
-function Index({userRepos,userStarredRepos,user}) {
-  console.log(userRepos,userStarredRepos,user)
+function Index({userRepos,userStarredRepos,user,router}) {
+  const tabKey = router.query.key || '1'
+  const handleTabChange = activeKey=>{
+    router.push(`/?key=${activeKey}`)
+  }
+
+  useEffect(() => {
+    if(!isServer) {
+      // cachedUserRepos = userRepos
+      // cachedUserStarredRepos = userStarredRepos
+      if(userRepos) {
+        cache.set('userRepos',userRepos)
+      }
+      if(userStarredRepos) {
+        cache.set('userStarredRepos',userStarredRepos)
+      }
+    }  
+  },[userRepos,userStarredRepos])
   if(!user || !user.id) {
     return(
     <div className="root">
@@ -37,15 +60,26 @@ function Index({userRepos,userStarredRepos,user}) {
         <span className="bio">{user.bio}</span>
         <p className="email">
           <Icon type="mail" style={{marginRight: 10}}></Icon>
-          <a href={`mailto:${user.email}`}>{user.email}</a>
+          <a href={`mailto:${user.email}`}>{user.email || "839228534@qq.com"}</a>
         </p>
       </div>
       <div className="user-repos">
-        {
-          userRepos.map((repo)=>{
-            return (<Repo repo={repo}></Repo>)
-          })
-        }
+        <Tabs defaultActiveKey={tabKey} onChange={handleTabChange} animated={false}>
+          <Tabs.TabPane tab="你的仓库" key="1">
+            {
+              userRepos.map((repo)=>{
+                return (<Repo key={repo.id} repo={repo}></Repo>)
+              })
+            }
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="你关注的仓库" key="2">
+            {
+              userStarredRepos.map((repo)=>{
+                return (<Repo key={repo.id} repo={repo}></Repo>)
+              })
+            }
+          </Tabs.TabPane>
+        </Tabs>
       </div>
       <style jsx>{`
       .root {
@@ -85,11 +119,21 @@ function Index({userRepos,userStarredRepos,user}) {
   )
 }
 
+
+
 Index.getInitialProps = async ({ctx,reduxStore})=> {
   const user = reduxStore.getState().user
   if(!user||!user.id) {
     return {
       isLogin: false
+    }
+  }
+  if(!isServer) {
+    if(cache.get('userRepos') && cache.get('userStarredRepos')) {
+      return {
+        userRepos: cache.get('userRepos'),
+        userStarredRepos: cache.get('userStarredRepos')
+      }
     }
   }
   const userRepos = await api.request({
@@ -99,6 +143,8 @@ Index.getInitialProps = async ({ctx,reduxStore})=> {
   const userStarredRepos = await api.request({
     url: '/user/starred'
   },ctx.req,ctx.res)
+
+
   return {
     isLogin: true,
     userRepos: userRepos.data,
@@ -111,4 +157,4 @@ function mapState(state) {
   }
 }
 
-export default connect(mapState)(Index)
+export default withRouter(connect(mapState)(Index))

@@ -3,7 +3,6 @@ import React from 'react'
 import {Provider} from 'react-redux'
 import Router from 'next/router'
 import axios from 'axios'
-import Link from 'next/link'
 import 'antd/dist/antd.css'
 import Head from 'next/head'
 import Layout from '../components/Layout'
@@ -21,7 +20,6 @@ class MyApp extends App {
     return { pageProps }
   }
   state = {
-    context: 'value',
     loading: false
   }
 

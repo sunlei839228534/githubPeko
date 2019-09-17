@@ -42,7 +42,7 @@ export default ({repo}) => {
           display: flex;
           justify-content: space-between;
         }
-        .other-info > span + span {
+        .other-info > span + span{
           margin-right: 10px
         }
         .root + .root {
