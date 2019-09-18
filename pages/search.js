@@ -1,4 +1,4 @@
-import {useCallback} from 'react'
+import {memo} from 'react'
 import Router,{withRouter} from 'next/router'
 import {Row,Col,List} from 'antd'
 import Link from 'next/link'
@@ -37,22 +37,24 @@ const SORT_TYPES = [
  * 
  */
 
- const FilterLink = ({ name, query, lang, sort, order}) => {
+ const FilterLink = memo(({ name, query, lang, sort, order}) => {
+  // const doSearch = (config) => {
+  //   Router.push({
+  //     pathname: '/search',
+  //     query: {
+  //       query,
+  //       lang,
+  //       sort,
+  //       order
+  //     }
+  //   })
+  // }
+  let queryString = `?query=${query}`
+  if(lang) queryString+= `&lang=${lang}`
+  if(sort) queryString+= `&sort=${sort}&order=${order || 'desc'}`
 
-  const doSearch = (config) => {
-    Router.push({
-      pathname: '/search',
-      query: {
-        query,
-        lang,
-        sort,
-        order
-      }
-    })
-  }
-
-   return <a onClick={doSearch}>{name}</a>
- }
+   return <Link href={`/search${queryString}`}><a>{name}</a></Link>
+ })
 
  const selectedItemStyle = {
    borderLeft: '2px solid #e36209',
@@ -62,9 +64,8 @@ const SORT_TYPES = [
 
 function Search({router,repos}) {
   console.log(repos)
-
-  const { sort, order, lang ,query} = router.query
-
+  const { ...querys} = router.query
+  const {lang,sort,order} = router.query
 
   // const doSearch = (config) => {
   //   router.push({
@@ -88,7 +89,7 @@ function Search({router,repos}) {
 
               return (
                 <List.Item style={selected ? selectedItemStyle :null}>
-                  <FilterLink lang={item} query={query} order={order} name={item} sort={sort} />
+                  {selected ? <span>{item}</span> : <FilterLink {...querys} lang={item} name={item}/> } 
                 </List.Item>
               )
             }}
@@ -103,13 +104,13 @@ function Search({router,repos}) {
               if(item.name === "Best Match" && !sort) {
                 selected = true
               } else if (item.value === sort && item.order === order) {
-                selected = false
+                selected = true
               }
               return (
                 <List.Item style={selected ? selectedItemStyle : null}>
-                   <a onClick={()=>doSearch({
-                     lang,query,sort:item.value || '',order:item.order || ''
-                   })}>{item.name}</a>
+                 {
+                   selected ? <span>{item.name}</span> : <FilterLink {...querys} sort={item.value} order={item.order} name={item.name}/>
+                 }
                 </List.Item>
               )
             }}
@@ -117,6 +118,15 @@ function Search({router,repos}) {
         </Col>
       </Row>
       </div>
+      <style jsx>{`
+        .root {
+          padding: 20px 0;
+        }
+        .list-header {
+          font-weight: 800;
+          font-size: 16px;
+        }
+      `}</style>
     </div>
   )
 }
