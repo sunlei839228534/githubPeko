@@ -1,10 +1,12 @@
-import {memo} from 'react'
+import {memo,isValidElement} from 'react'
 import Router,{withRouter} from 'next/router'
-import {Row,Col,List} from 'antd'
+import {Row,Col,List,Pagination} from 'antd'
 import Link from 'next/link'
+import Repo from '../components/Repo'
 
 const api = require('../lib/api')
 
+const per_page = 20
 const LANGUAGES = ['JavaScript','HTML','CSS','TypeScript','Java','Rust']
 const SORT_TYPES = [
   {
@@ -37,7 +39,7 @@ const SORT_TYPES = [
  * 
  */
 
- const FilterLink = memo(({ name, query, lang, sort, order}) => {
+ const FilterLink = memo(({ name, query, lang, sort, order,page}) => {
   // const doSearch = (config) => {
   //   Router.push({
   //     pathname: '/search',
@@ -52,8 +54,13 @@ const SORT_TYPES = [
   let queryString = `?query=${query}`
   if(lang) queryString+= `&lang=${lang}`
   if(sort) queryString+= `&sort=${sort}&order=${order || 'desc'}`
+  if(page) queryString+= `&page=${page}`
 
-   return <Link href={`/search${queryString}`}><a>{name}</a></Link>
+  queryString += `&per_page=${per_page}`
+
+   return <Link href={`/search${queryString}`}>
+     {isValidElement(name) ? name: <a>{name}</a>}
+      </Link>
  })
 
  const selectedItemStyle = {
@@ -65,7 +72,11 @@ const SORT_TYPES = [
 function Search({router,repos}) {
   console.log(repos)
   const { ...querys} = router.query
-  const {lang,sort,order} = router.query
+  const {lang,sort,order,page} = router.query
+
+  const noop = () =>{}
+
+
 
   // const doSearch = (config) => {
   //   router.push({
@@ -116,6 +127,25 @@ function Search({router,repos}) {
             }}
           />
         </Col>
+        <Col span={18}>
+          <h3 className="repos-title">{repos.total_count}个仓库</h3>
+          {
+            repos.items.map(repo => <Repo repo={repo} key={repo.id} />)
+          }
+          <div className="pagination">
+              <Pagination
+                pageSize={per_page}
+                current={Number(page) || 1}
+                total={1000}
+                onChange={noop}
+                itemRender={(page, type, ol) => {
+                  const p = type === 'page' ? page : type === 'prev' ? page - 1 : page + 1
+                  const name = type === 'page' ? page : ol
+                  return <FilterLink {...querys} page={p} name={name}  />
+                }}
+              />
+          </div>
+        </Col>
       </Row>
       </div>
       <style jsx>{`
@@ -125,6 +155,15 @@ function Search({router,repos}) {
         .list-header {
           font-weight: 800;
           font-size: 16px;
+        }
+        .repos-title {
+          border-bottom: 1px solid #eee;
+          font-size: 24px;
+          line-height: 50px;
+        }
+        .pagination {
+          padding: 20px;
+          text-align: center
         }
       `}</style>
     </div>
@@ -147,7 +186,7 @@ Search.getInitialProps = async ({ctx}) =>{
   if(lang) queryString+= `+language:${lang}`
   if(sort) queryString+= `&sort=${sort}&order=${order || 'desc'}`
   if(page) queryString+= `page=${page}`
-
+  queryString += `&per_page=${per_page}`
   const result = await api.request({
     url: `/search/repositories${queryString}`
   },ctx.req,ctx.res)
