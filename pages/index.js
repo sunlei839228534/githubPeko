@@ -4,12 +4,14 @@ import getConfig from 'next/config'
 import {connect} from 'react-redux'
 import { withRouter } from 'next/router'
 import LRU from 'lru-cache'
+import Repo from '../components/Repo'
+import {cacheArray} from '../lib/repo-basic-cache'
 
 const cache = new LRU({
   maxAge: 1000 * 60 * 10
 })
 
-import Repo from '../components/Repo'
+
 const isServer = typeof window === "undefined"
 
 const { publicRuntimeConfig } = getConfig()
@@ -25,6 +27,8 @@ function Index({userRepos,userStarredRepos,user,router}) {
 
   useEffect(() => {
     if(!isServer) {
+      cacheArray(userRepos)
+      cacheArray(userStarredRepos)
       // cachedUserRepos = userRepos
       // cachedUserStarredRepos = userStarredRepos
       if(userRepos) {

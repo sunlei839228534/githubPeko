@@ -1,13 +1,22 @@
+import {useEffect} from 'react'
 import Repo from './Repo'
 import Link from 'next/link'
 import { withRouter } from 'next/router'
 
 import api from '../lib/api'
+import { get,cache } from '../lib/repo-basic-cache'
+
+const isServer = typeof window === 'undefined'
 
 
-export default function (Comp) {
+export default function (Comp,type="index") {
   function WithDetail({ repoBasic,router,...rest }) {
     console.log(repoBasic)
+    useEffect(()=>{
+      if(!isServer) {
+        cache(repoBasic)
+      }
+    },[])
 
     function makeQuery(queryObject) {
       const query = Object.entries(queryObject).reduce((result,entry) => {
@@ -23,12 +32,18 @@ export default function (Comp) {
         <div className="repo-basic">
           <Repo repo={repoBasic} />
           <div className="tabs">
-            <Link href={`/detail${query}`}>
+            {
+              type === 'index' ? <span className="tab">Readme</span> :
+              <Link href={`/detail${query}`}>
               <a className="tab index">Readme</a>
-            </Link>
-            <Link href={`/detail/issues${query}`}>
+               </Link>
+            }
+            {
+              type === 'issues' ? <span className="tab">Issues</span> :
+              <Link href={`/detail/issues${query}`}>
               <a className="tab issues">Issues</a>
-            </Link>
+               </Link>
+            }
           </div>
         </div>
         <div><Comp {...rest} /></div>
@@ -53,14 +68,27 @@ export default function (Comp) {
   WithDetail.getInitialProps = async (context) => {
     const {router ,ctx} = context
     const { owner, name} = ctx.query
-    const repoBasic = await api.request({
-      url: `/repos/${owner}/${name}`
-    },ctx.req,ctx.res)
+
+    const full_name = `${owner}/${name}`
+
+
 
     let pageData = {}
     if(Comp.getInitialProps) {
       pageData = await Comp.getInitialProps(context)  
     }
+    if(get(full_name)) {
+      return {
+        repoBasic: get(full_name),
+        ...pageData
+      }
+    }
+    
+    const repoBasic = await api.request({
+      url: `/repos/${owner}/${name}`
+    },ctx.req,ctx.res)
+
+
     return {
       repoBasic: repoBasic.data,
       ...pageData

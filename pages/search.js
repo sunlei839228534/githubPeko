@@ -1,12 +1,15 @@
-import {memo,isValidElement} from 'react'
+import {memo,isValidElement,useEffect} from 'react'
 import Router,{withRouter} from 'next/router'
 import {Row,Col,List,Pagination} from 'antd'
 import Link from 'next/link'
 import Repo from '../components/Repo'
+import { cacheArray } from '../lib/repo-basic-cache'
 
 const api = require('../lib/api')
 
 const per_page = 20
+
+const isServer = typeof window === 'undefined'
 const LANGUAGES = ['JavaScript','HTML','CSS','TypeScript','Java','Rust']
 const SORT_TYPES = [
   {
@@ -74,10 +77,12 @@ function Search({router,repos}) {
   const { ...querys} = router.query
   const {lang,sort,order,page} = router.query
 
+  useEffect(()=>{
+    if(!isServer) {
+      cacheArray(repos.items)
+    }
+  },[])
   const noop = () =>{}
-
-
-
   // const doSearch = (config) => {
   //   router.push({
   //     pathname: '/search',

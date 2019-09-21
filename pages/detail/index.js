@@ -1,13 +1,30 @@
+import MarkdownIt from 'markdown-it'
 import withRepoBasic from '../../components/with-repo-basic'
+import api from '../../lib/api'
 
-function Detail ({text}) {
-  return <span>detail index {text}</span>
+const md = new MarkdownIt()
+
+function Detail ({readme}) {
+  const content = atob(readme.content)
+  const html = md.render(content)
+
+  return <div dangerouslySetInnerHTML={{__html: html}} />
 }
 
-Detail.getInitialProps = async() => {
+Detail.getInitialProps = async({
+  ctx: {
+    query: { owner , name},
+    req,
+    res
+  }
+}) => {
+  const readmeResp = await api.request({
+    url: `/repos/${owner}/${name}/readme`
+  },req,res)
+
   return {
-    text:123
+    readme: readmeResp.data
   }
 }
 
-export default withRepoBasic(Detail)
+export default withRepoBasic(Detail, 'index')
