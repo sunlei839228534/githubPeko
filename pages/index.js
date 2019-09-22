@@ -33,12 +33,8 @@ function Index({userRepos,userStarredRepos,user,router}) {
           cacheArray(userStarredRepos)
           // cachedUserRepos = userRepos
           // cachedUserStarredRepos = userStarredRepos
-          if(userRepos) {
-            cache.set('userRepos',userRepos)
-          }
-          if(userStarredRepos) {
-            cache.set('userStarredRepos',userStarredRepos)
-          }
+          cache.set('userRepos',userRepos)
+          cache.set('userStarredRepos',userStarredRepos)
         }
     }
   },[userRepos,userStarredRepos])

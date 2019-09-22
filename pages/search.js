@@ -3,7 +3,11 @@ import Router,{withRouter} from 'next/router'
 import {Row,Col,List,Pagination} from 'antd'
 import Link from 'next/link'
 import Repo from '../components/Repo'
-import { cacheArray } from '../lib/repo-basic-cache'
+import LRU from 'lru-cache'
+
+const REPO_CACHE = new LRU({
+  maxAge: 1000 * 60 * 60
+})
 
 const api = require('../lib/api')
 
@@ -73,13 +77,13 @@ const SORT_TYPES = [
 
 
 function Search({router,repos}) {
-  console.log(repos)
   const { ...querys} = router.query
   const {lang,sort,order,page} = router.query
 
   useEffect(()=>{
-    if(!isServer) {
-      cacheArray(repos.items)
+    if(repos) {
+      REPO_CACHE.set('search-repos',repos)
+      REPO_CACHE.set('current-router',router.query)
     }
   },[])
   const noop = () =>{}
@@ -177,7 +181,6 @@ function Search({router,repos}) {
 
 Search.getInitialProps = async ({ctx}) =>{
   const {query,sort,lang,order,page} = ctx.query
-
   if(!query) {
     return {
       repos: {
@@ -192,6 +195,27 @@ Search.getInitialProps = async ({ctx}) =>{
   if(sort) queryString+= `&sort=${sort}&order=${order || 'desc'}`
   if(page) queryString+= `page=${page}`
   queryString += `&per_page=${per_page}`
+  if(!isServer) {
+    const currentQuery = REPO_CACHE.get('current-router') || ''
+    console.log(currentQuery.query)
+    console.log(query)
+    const repos = REPO_CACHE.get('search-repos')
+    if(query === currentQuery.query && repos) {
+      REPO_CACHE.set('current-router',query)
+      REPO_CACHE.set('search-repos',repos)
+      console.log(repos)
+      return {
+        repos
+      }
+    }else {
+      const result = await api.request({
+        url: `/search/repositories${queryString}`
+      },ctx.req,ctx.res)
+      return {
+        repos: result.data
+      }
+    }
+  }
   const result = await api.request({
     url: `/search/repositories${queryString}`
   },ctx.req,ctx.res)

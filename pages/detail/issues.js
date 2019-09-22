@@ -7,14 +7,15 @@ function getLastUpdated(time){
 }
 
 function Issues ({issues}) {
+  console.log(issues)
   return (
     <>
     {
       issues.map(item=> {
         return (
-          <div>
+          <div key={item.id}>
             <div className="issues">
-              <div className="title">{item.title}</div>
+              <div className="title"><a href={item.html_url}>{item.title}</a></div>
               <span>#{item.number} opened {getLastUpdated(item.created_at)} by {item.user.login}</span>
             </div>
             <style jsx>{`
@@ -25,6 +26,7 @@ function Issues ({issues}) {
               }
               .title {
                 font-size: 16px;
+                color: #F8F8FF
                 font-weight: 600;
               }
             `}</style>
