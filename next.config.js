@@ -1,4 +1,3 @@
-const webpack = require('webpack')
 const withCss = require('@zeit/next-css')
 const config = require('./config')
 const withBundleAnalyze = require('@zeit/next-bundle-analyzer')
@@ -13,10 +12,6 @@ const SCOPE = 'user'
 
 module.exports = withBundleAnalyze(
   withCss({
-  webpack(config) {
-    config.plugins.push(new webpack.IgnorePlugin(/^\.\/locale$/),/moment$/)
-    return config
-  },
   publicRuntimeConfig: {
     GITHUB_OAUTH_URL,
     OAUTH_URL: `${GITHUB_OAUTH_URL}?client_id=${config.github.client_id}&scope=${SCOPE}`

@@ -10,7 +10,7 @@ import testHoc from '../lib/with-redux'
 import PageLoading from '../components/PageLoading'
 
 class MyApp extends App {
-
+  
   static async getInitialProps(ctx) {
     const { Component } = ctx
     let pageProps = {}
