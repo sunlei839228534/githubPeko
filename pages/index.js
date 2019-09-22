@@ -25,19 +25,22 @@ function Index({userRepos,userStarredRepos,user,router}) {
     router.push(`/?key=${activeKey}`)
   }
 
-  useEffect(() => {
-    if(!isServer) {
-      cacheArray(userRepos)
-      cacheArray(userStarredRepos)
-      // cachedUserRepos = userRepos
-      // cachedUserStarredRepos = userStarredRepos
+
+    useEffect(() => {
       if(userRepos) {
-        cache.set('userRepos',userRepos)
-      }
-      if(userStarredRepos) {
-        cache.set('userStarredRepos',userStarredRepos)
-      }
-    }  
+        if(!isServer) {
+          cacheArray(userRepos)
+          cacheArray(userStarredRepos)
+          // cachedUserRepos = userRepos
+          // cachedUserStarredRepos = userStarredRepos
+          if(userRepos) {
+            cache.set('userRepos',userRepos)
+          }
+          if(userStarredRepos) {
+            cache.set('userStarredRepos',userStarredRepos)
+          }
+        }
+    }
   },[userRepos,userStarredRepos])
   if(!user || !user.id) {
     return(

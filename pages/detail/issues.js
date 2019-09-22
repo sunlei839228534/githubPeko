@@ -1,13 +1,19 @@
 import withRepoBasic from '../../components/with-repo-basic'
+import api from '../../lib/api'
 
-function Issues ({text}) {
-  return <span>issues index {text}</span>
+function Issues ({issues}) {
+  console.log(issues)
+  return <span>issues index</span>
 }
 
-Issues.getInitialProps = async() => {
-  console.log('issues')
+Issues.getInitialProps = async({ ctx }) => {
+  const { owner, name} = ctx.query
+
+  const issuesResp = await api.request({
+    url: `/repos/${owner}/${name}/issues`
+  },ctx.req,ctx.res)
   return {
-    text:123
+    issues: issuesResp.data
   }
 }
 

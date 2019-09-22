@@ -11,7 +11,6 @@ const isServer = typeof window === 'undefined'
 
 export default function (Comp,type="index") {
   function WithDetail({ repoBasic,router,...rest }) {
-    console.log(repoBasic)
     useEffect(()=>{
       if(!isServer) {
         cache(repoBasic)
@@ -46,7 +45,9 @@ export default function (Comp,type="index") {
             }
           </div>
         </div>
-        <div><Comp {...rest} /></div>
+        <div>
+          <Comp className="hidden" {...rest} />
+        </div>
         <style jsx>{`
         .root {
           padding-top: 20px
