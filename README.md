@@ -1,1 +1,12 @@
-# githubPeko
+项目使用react服务端渲染框架next.js + antd 进行开发
+
+关于ssr： 服务器端渲染，解决了seo不友好，首屏展示慢，初始化一些数据的问题
+
+服务端渲染其实就是在服务端把html拼接好，然后直接返回客户端的操作，但是因为在服务端是没有DOM，Events的，所以我们需要考虑的是如何把元素的事件，去一起返回给客户端。nextjs的做法是,在服务端返回html的同时，给页面返回一个js文件，这个文件的内容就是我们在页面中的一些交互逻辑，每一个路由都会有一个html和js文件，这样就可以渲染出一个有交互逻辑的html模板。
+
+
+项目使用的是github的权限认证接口，接入第三方的登陆验证。现在类似微博，微信都会使用这种第三方认证授权登陆。
+
+首先需要在github创建一个OAuth App,该app会有一个clientID和clientSecret，这是我们接下来获取登陆权限的重要数据。还需要设置一个Authorization callback URL，通过这个url来获取github返回的code。这里设置的是本地地址，项目上线后需改成相应的项目地址。
+
+接下来我们来看认证流程，首先向github官方提供的api发出请求，需要带上client_id,随后通过设置的Authorization callback URL会跳转到相应的链接，该页面的uri中带了一个code的参数。然后我们使用code+client_id+client_secret作为body,向github发起一个post请求,该请求会返回一个access_token,接下来就可以使用access_token向github请求你相应的用户数据了。这套流程非常安全，原因在于一次性的code+id+secret这样一套体系。
