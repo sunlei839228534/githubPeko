@@ -1,5 +1,5 @@
 import {memo,isValidElement,useEffect} from 'react'
-import Router,{withRouter} from 'next/router'
+import {withRouter} from 'next/router'
 import {Row,Col,List,Pagination} from 'antd'
 import Link from 'next/link'
 import Repo from '../components/Repo'
